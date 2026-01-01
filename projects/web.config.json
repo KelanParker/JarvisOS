@@ -1,0 +1,6 @@
+{
+  "name": "Web Client",
+  "allowedTools": ["getTime", "getDate"],
+  "personality": "friendly",
+  "memory": false
+}

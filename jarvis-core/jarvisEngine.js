@@ -1,18 +1,20 @@
-export async function runJarvis(input) {
+import { tools } from "./tools/toolRegistry.js";
+
+export async function runJarvis(input, context = "default") {
   const text = input.toLowerCase();
 
-  // UNIVERSAL intent classification
-  if (text.startsWith("open") || text.startsWith("run")) {
+  if (text.includes("time")) {
     return {
-      intent: "action",
-      prompt: input
+      intent: "tool",
+      tool: "getTime",
+      context
     };
   }
 
-  if (text.includes("explain") || text.includes("what is")) {
+  if (text.includes("system info")) {
     return {
-      intent: "knowledge",
-      prompt: input
+      intent: "tool",
+      tool: "systemInfo"
     };
   }
 

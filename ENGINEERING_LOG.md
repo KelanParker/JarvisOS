@@ -82,3 +82,23 @@ Separating decision logic from AI generation allows future expansion such as too
 Initially considered routing logic tied to a specific application. 
 Corrected approach to ensure JarvisOS remains a universal, project-agnostic core.
 Domain-specific behavior will be implemented later via configuration-based modules.
+
+---
+
+## Day 1 – Permissions & Project Configuration
+
+### Objective
+Implement a robust permission system and project-based configuration to control tool access and define project-specific behaviors.
+
+### Implementation
+- **Project Configuration**: Created `projects/` directory with JSON configs (`default.config.json`, `web.config.json`) defining allowed tools and personality traits.
+- **Permission Manager**: Implemented `permissionManager.js` to dynamically load configs and validate tool usage requests.
+- **Tool Registry**: Established `toolRegistry.js` containing system tools (`getTime`, `getDate`, `systemInfo`).
+- **Core Integration**: Updated `jarvisEngine.js` to detect tool intents and `server.js` to enforce permissions based on the client's project context.
+
+### Key Insight
+Configuration-driven architecture allows the same Jarvis core to serve different frontends (Web, Desktop) with strict security boundaries without code changes.
+
+### Verification
+- **Allowed Action**: Web client successfully requested time (`getTime`).
+- **Blocked Action**: Web client was correctly denied access to system information (`systemInfo`), proving the permission system works.

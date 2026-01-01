@@ -1,21 +1,36 @@
 import express from "express";
 import cors from "cors";
 import { runJarvis } from "../jarvis-core/jarvisEngine.js";
+import { tools } from "../jarvis-core/tools/toolRegistry.js";
+import { isToolAllowed, loadProjectConfig } from "../jarvis-core/permissions/permissionManager.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.post("/chat", async (req, res) => {
-  const { message } = req.body;
+  const { message, project = "default" } = req.body;
 
   if (!message) {
     return res.status(400).json({ error: "Message is required" });
   }
 
   try {
+    const projectConfig = loadProjectConfig(project);
     const decision = await runJarvis(message);
     console.log("Jarvis Intent:", decision.intent);
+
+    if (decision.intent === "tool") {
+      if (!isToolAllowed(decision.tool, projectConfig)) {
+        return res.json({
+          reply: "This action is not permitted for this project."
+        });
+      }
+
+      const result = tools[decision.tool]();
+      return res.json({ reply: result });
+    }
+
     const prompt = decision.prompt;
 
     const ollamaResponse = await fetch(

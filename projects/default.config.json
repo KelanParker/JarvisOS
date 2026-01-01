@@ -1,0 +1,6 @@
+{
+  "name": "JarvisOS Default",
+  "allowedTools": ["getTime", "getDate", "systemInfo"],
+  "personality": "neutral",
+  "memory": false
+}
