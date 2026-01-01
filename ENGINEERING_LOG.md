@@ -117,3 +117,33 @@ Introduce short-term memory to maintain conversational context.
 
 ### Outcome
 JarvisOS can now maintain context across multiple interactions.
+
+---
+
+## Day 3 – Web Client Integration
+
+### Objective
+Create a minimal web-based UI to interact with JarvisOS.
+
+### Implementation
+- Built React-based chat interface
+- Connected frontend to JarvisOS API
+- Verified session memory and permission behavior via UI
+
+### Outcome
+JarvisOS can now be demonstrated interactively through a browser-based client.
+
+---
+
+## Day 3 – Response Control & Verbosity Management
+
+### Objective
+Prevent overly verbose AI responses while maintaining usefulness.
+
+### Implementation
+- Introduced a global JarvisOS system prompt
+- Enforced concise default response behavior
+- Allowed expanded explanations only on explicit user request
+
+### Outcome
+JarvisOS now responds in a controlled, assistant-like manner rather than long-form educational output.

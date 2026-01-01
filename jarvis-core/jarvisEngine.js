@@ -18,8 +18,14 @@ export async function runJarvis(input, context = "default") {
     };
   }
 
+  let verbosity = "low";
+  if (text.includes("explain in detail") || text.includes("deeply")) {
+    verbosity = "high";
+  }
+
   return {
     intent: "chat",
-    prompt: input
+    prompt: input,
+    verbosity
   };
 }

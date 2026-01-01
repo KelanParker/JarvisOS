@@ -5,6 +5,20 @@ import { tools } from "../jarvis-core/tools/toolRegistry.js";
 import { isToolAllowed, loadProjectConfig } from "../jarvis-core/permissions/permissionManager.js";
 import { addToSession, getSession } from "../jarvis-core/memory/sessionMemory.js";
 
+const SYSTEM_PROMPT_SHORT = `
+You are JarvisOS, a concise and intelligent AI assistant.
+- Answer in 1-2 sentences maximum.
+- Be extremely brief and direct.
+- Do not elaborate.
+`;
+
+const SYSTEM_PROMPT_DETAILED = `
+You are JarvisOS, a knowledgeable AI assistant.
+- Provide detailed and comprehensive explanations.
+- Cover multiple aspects of the topic.
+- Use examples where appropriate.
+`;
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -35,9 +49,23 @@ app.post("/chat", async (req, res) => {
     addToSession(sessionId, "user", message);
     const session = getSession(sessionId);
 
-    const prompt = session
+    const conversationHistory = session
       .map(m => `${m.role}: ${m.content}`)
       .join("\n");
+
+    const systemPrompt = decision.verbosity === "high" ? SYSTEM_PROMPT_DETAILED : SYSTEM_PROMPT_SHORT;
+    const numPredict = decision.verbosity === "high" ? 1000 : 100;
+
+    console.log(`Verbosity Mode: ${decision.verbosity} (Limit: ${numPredict} tokens)`);
+
+    const finalPrompt = `
+${systemPrompt}
+
+Conversation:
+${conversationHistory}
+
+Assistant:
+`;
 
     const ollamaResponse = await fetch(
       "http://localhost:11434/api/generate",
@@ -46,8 +74,9 @@ app.post("/chat", async (req, res) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "huihui_ai/dolphin3-abliterated:8b",
-          prompt: prompt,
-          stream: false
+          prompt: finalPrompt,
+          stream: false,
+          num_predict: numPredict
         })
       }
     );
