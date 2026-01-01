@@ -31,34 +31,49 @@ export default function ChatBox() {
   };
 
   return (
-    <div style={{ maxWidth: "600px", margin: "40px auto" }}>
-      <h2>JarvisOS Web Client</h2>
-
-      <div
-        style={{
-          border: "1px solid #ccc",
-          padding: "16px",
-          height: "400px",
-          overflowY: "auto",
-          marginBottom: "12px"
-        }}
-      >
-        {messages.map((m, i) => (
-          <Message key={i} role={m.role} text={m.text} />
-        ))}
-
-        {loading && <p>Jarvis is thinking...</p>}
+    <div className="w-full max-w-4xl mx-auto">
+      {/* Futuristic Header */}
+      <div className="mb-6 text-center">
+        <h1 className="text-4xl font-bold text-jarvis-cyan text-glow-cyan tracking-wider">
+          JARVIS<span className="text-white">OS</span>
+        </h1>
+        <p className="text-sm text-gray-400 mt-2 tracking-widest">ARTIFICIAL INTELLIGENCE INTERFACE</p>
       </div>
 
-      <div style={{ display: "flex", gap: "8px" }}>
-        <input
-          value={input}
-          onChange={e => setInput(e.target.value)}
-          placeholder="Type a message..."
-          style={{ flex: 1, padding: "8px" }}
-          onKeyDown={e => e.key === "Enter" && handleSend()}
-        />
-        <button onClick={handleSend}>Send</button>
+      {/* Glassmorphism Chat Panel */}
+      <div className="glass-panel rounded-2xl p-6 shadow-2xl">
+        {/* Messages Container */}
+        <div className="h-[500px] overflow-y-auto mb-6 px-2 scrollbar-thin scrollbar-thumb-jarvis-cyan/30 scrollbar-track-transparent">
+          {messages.map((m, i) => (
+            <Message key={i} role={m.role} text={m.text} />
+          ))}
+
+          {loading && (
+            <div className="flex items-center space-x-2 text-jarvis-cyan animate-pulse">
+              <div className="w-2 h-2 bg-jarvis-cyan rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-jarvis-cyan rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-jarvis-cyan rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              <span className="ml-2 text-sm">JARVIS is processing...</span>
+            </div>
+          )}
+        </div>
+
+        {/* Input Area */}
+        <div className="flex gap-3">
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            placeholder="ENTER COMMAND..."
+            className="flex-1 bg-jarvis-darker/80 border border-jarvis-cyan/30 rounded-xl px-5 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-jarvis-cyan focus:glow-cyan transition-all duration-300"
+            onKeyDown={e => e.key === "Enter" && handleSend()}
+          />
+          <button
+            onClick={handleSend}
+            className="px-8 py-3 bg-gradient-to-r from-jarvis-cyan to-jarvis-blue rounded-xl font-semibold text-jarvis-darker hover:glow-cyan transform hover:scale-105 transition-all duration-300 active:scale-95"
+          >
+            SEND
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,53 +1,51 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  :root {
+    font-family: 'JetBrains Mono', 'Courier New', monospace;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0A0E1A 0%, #050810 50%, #0D1321 100%);
+    background-attachment: fixed;
+    color: #E5E7EB;
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
+@layer utilities {
+  .glass-panel {
+    background: rgba(10, 14, 26, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 217, 255, 0.2);
+  }
+  
+  .glow-cyan {
+    box-shadow: 0 0 10px rgba(0, 217, 255, 0.3), 
+                0 0 20px rgba(0, 217, 255, 0.2), 
+                inset 0 0 10px rgba(0, 217, 255, 0.1);
+  }
+  
+  .glow-blue {
+    box-shadow: 0 0 10px rgba(10, 132, 255, 0.3), 
+                0 0 20px rgba(10, 132, 255, 0.2);
+  }
+  
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0, 217, 255, 0.5), 
+                 0 0 20px rgba(0, 217, 255, 0.3);
+  }
 }
 button:focus,
 button:focus-visible {
