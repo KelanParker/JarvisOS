@@ -65,15 +65,15 @@ The system is designed to run entirely on local infrastructure for learning and 
 
 ---
 
-### Known Limitations (Day 1)
-- Text-only interaction
-- No memory persistence
-- Single model usage
-- Local execution only
+## Day 1 – Jarvis Decision Layer
 
----
+### Objective
+Introduce a basic Jarvis decision-making layer between the API and the AI model.
 
-### Next Steps (Day 2)
-- Create `jarvis-core` engine logic
-- Move AI interaction code out of route handlers
-- Introduce intent detection layer
+### Implementation
+- Created a `jarvisEngine` to handle decision logic
+- Implemented rule-based intent detection
+- Routed repair-related messages to a specialized prompt
+
+### Key Insight
+Separating decision logic from AI generation allows future expansion such as tool usage, permissions, and project-specific behavior.
