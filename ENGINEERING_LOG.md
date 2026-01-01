@@ -102,3 +102,18 @@ Configuration-driven architecture allows the same Jarvis core to serve different
 ### Verification
 - **Allowed Action**: Web client successfully requested time (`getTime`).
 - **Blocked Action**: Web client was correctly denied access to system information (`systemInfo`), proving the permission system works.
+
+---
+
+## Day 2 – Session Memory System
+
+### Objective
+Introduce short-term memory to maintain conversational context.
+
+### Implementation
+- Implemented in-memory session store
+- Attached memory to session identifiers
+- Injected conversation history into AI prompts
+
+### Outcome
+JarvisOS can now maintain context across multiple interactions.

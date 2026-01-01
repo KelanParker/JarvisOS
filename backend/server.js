@@ -3,13 +3,14 @@ import cors from "cors";
 import { runJarvis } from "../jarvis-core/jarvisEngine.js";
 import { tools } from "../jarvis-core/tools/toolRegistry.js";
 import { isToolAllowed, loadProjectConfig } from "../jarvis-core/permissions/permissionManager.js";
+import { addToSession, getSession } from "../jarvis-core/memory/sessionMemory.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.post("/chat", async (req, res) => {
-  const { message, project = "default" } = req.body;
+  const { message, project = "default", sessionId = "default" } = req.body;
 
   if (!message) {
     return res.status(400).json({ error: "Message is required" });
@@ -31,7 +32,12 @@ app.post("/chat", async (req, res) => {
       return res.json({ reply: result });
     }
 
-    const prompt = decision.prompt;
+    addToSession(sessionId, "user", message);
+    const session = getSession(sessionId);
+
+    const prompt = session
+      .map(m => `${m.role}: ${m.content}`)
+      .join("\n");
 
     const ollamaResponse = await fetch(
       "http://localhost:11434/api/generate",
@@ -53,6 +59,8 @@ app.post("/chat", async (req, res) => {
     }
 
     const data = await ollamaResponse.json();
+
+    addToSession(sessionId, "assistant", data.response);
 
     res.json({
       reply: data.response
