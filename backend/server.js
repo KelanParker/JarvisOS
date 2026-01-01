@@ -14,6 +14,10 @@ app.post("/chat", async (req, res) => {
   }
 
   try {
+    const decision = await runJarvis(message);
+    console.log("Jarvis Intent:", decision.intent);
+    const prompt = decision.prompt;
+
     const ollamaResponse = await fetch(
       "http://localhost:11434/api/generate",
       {
@@ -21,7 +25,7 @@ app.post("/chat", async (req, res) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "huihui_ai/dolphin3-abliterated:8b",
-          prompt: message,
+          prompt: prompt,
           stream: false
         })
       }
@@ -35,13 +39,6 @@ app.post("/chat", async (req, res) => {
 
     const data = await ollamaResponse.json();
 
-    const decision = await runJarvis(message);
-
-        // Later this will choose tools, intents, etc.
-        console.log("Jarvis decision:", decision.type);
-
-
-
     res.json({
       reply: data.response
     });
@@ -54,4 +51,14 @@ app.post("/chat", async (req, res) => {
 
 app.listen(5000, () => {
   console.log("Jarvis backend running on port 5000");
+}).on('error', (err) => {
+  console.error("Server failed to start:", err);
+});
+
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });

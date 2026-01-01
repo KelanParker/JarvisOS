@@ -1,15 +1,23 @@
-export async function runJarvis(message) {
-  const lower = message.toLowerCase();
+export async function runJarvis(input) {
+  const text = input.toLowerCase();
 
-  if (lower.includes("laptop") || lower.includes("not turning on")) {
+  // UNIVERSAL intent classification
+  if (text.startsWith("open") || text.startsWith("run")) {
     return {
-      type: "repair",
-      prompt: `You are RepairMateAI. Help diagnose this issue:\n${message}`
+      intent: "action",
+      prompt: input
+    };
+  }
+
+  if (text.includes("explain") || text.includes("what is")) {
+    return {
+      intent: "knowledge",
+      prompt: input
     };
   }
 
   return {
-    type: "chat",
-    prompt: message
+    intent: "chat",
+    prompt: input
   };
 }

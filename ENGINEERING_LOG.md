@@ -77,3 +77,8 @@ Introduce a basic Jarvis decision-making layer between the API and the AI model.
 
 ### Key Insight
 Separating decision logic from AI generation allows future expansion such as tool usage, permissions, and project-specific behavior.
+
+## Architecture Correction
+Initially considered routing logic tied to a specific application. 
+Corrected approach to ensure JarvisOS remains a universal, project-agnostic core.
+Domain-specific behavior will be implemented later via configuration-based modules.
