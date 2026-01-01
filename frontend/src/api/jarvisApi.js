@@ -1,4 +1,4 @@
-export async function sendMessage(message) {
+export async function sendMessage(message, mode = "offline") {
   const res = await fetch("http://localhost:5000/chat", {
     method: "POST",
     headers: {
@@ -7,7 +7,8 @@ export async function sendMessage(message) {
     body: JSON.stringify({
       message,
       sessionId: "web-demo",
-      project: "web"
+      project: "web",
+      mode
     })
   });
 

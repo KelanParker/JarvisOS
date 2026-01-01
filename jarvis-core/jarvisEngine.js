@@ -1,4 +1,5 @@
 import { tools } from "./tools/toolRegistry.js";
+import { requiresRealtimeData } from "./awareness/realtimeDetector.js";
 
 export async function runJarvis(input, context = "default") {
   const text = input.toLowerCase();
@@ -23,9 +24,13 @@ export async function runJarvis(input, context = "default") {
     verbosity = "high";
   }
 
+  // Detect if query requires real-time data
+  const needsRealtime = requiresRealtimeData(input);
+
   return {
     intent: "chat",
     prompt: input,
-    verbosity
+    verbosity,
+    needsRealtime
   };
 }
