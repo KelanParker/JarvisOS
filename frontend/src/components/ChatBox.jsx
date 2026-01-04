@@ -1,5 +1,10 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { sendMessage } from "../api/jarvisApi";
+import HandTracker from "../gesture/HandTracker";
+import { GESTURES } from "../gesture/gestureConstants";
+import { detectGesture, gestureCommandMap } from "../gesture/useHandGestures";
+import { getStableGesture } from "../gesture/gestureStability";
+import ParticleCanvas from "../visual/ParticleCanvas";
 import Message from "./Message";
 
 export default function ChatBox() {
@@ -7,37 +12,128 @@ export default function ChatBox() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("offline"); // offline or online
+  const [particleState, setParticleState] = useState("idle");
+  const [gestureAvailable, setGestureAvailable] = useState(true);
+  const [gestureToast, setGestureToast] = useState("");
+  const lastGestureRef = useRef({ gesture: null, ts: 0 });
+  const cooldownRef = useRef(0);
+  const handMissingTimeoutRef = useRef(null);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const sendToJarvis = async (messageText, targetMode, { fromGesture = false } = {}) => {
+    if (!messageText?.trim()) return;
 
-    const userMessage = { role: "user", text: input };
+    const userMessage = { role: "user", text: messageText };
     setMessages(prev => [...prev, userMessage]);
-    setInput("");
     setLoading(true);
 
-    console.log("[Frontend] Sending message:", input);
-    console.log("[Frontend] Mode:", mode);
+    console.log("[Frontend] Sending message:", messageText);
+    console.log("[Frontend] Mode:", targetMode);
 
     try {
-      const data = await sendMessage(input, mode);
+      const data = await sendMessage(messageText, targetMode);
       console.log("[Frontend] Response received:", data);
-      
+
       const aiMessage = { role: "assistant", text: data.reply };
       setMessages(prev => [...prev, aiMessage]);
+      if (fromGesture) {
+        setParticleState("executed");
+        setTimeout(() => setParticleState("idle"), 800);
+      }
     } catch (err) {
       console.error("[Frontend] Error:", err);
       setMessages(prev => [
         ...prev,
         { role: "assistant", text: "Error connecting to JarvisOS." }
       ]);
+      if (fromGesture) {
+        setParticleState("error");
+        setTimeout(() => setParticleState("idle"), 1200);
+      }
     }
 
     setLoading(false);
   };
 
+  const handleSend = async () => {
+    const currentInput = input;
+    setInput("");
+    await sendToJarvis(currentInput, mode);
+  };
+
+  const canTrigger = () => {
+    const now = Date.now();
+    if (now - cooldownRef.current > 1200) {
+      cooldownRef.current = now;
+      return true;
+    }
+    return false;
+  };
+
+  const handleGesture = landmarks => {
+    if (!gestureAvailable) return;
+
+    const rawGesture = detectGesture(landmarks);
+    const stableGesture = getStableGesture(rawGesture);
+    if (!stableGesture) {
+      if (rawGesture) setParticleState("stable");
+      return;
+    }
+
+    const command = gestureCommandMap[stableGesture];
+    if (!command || !canTrigger()) return;
+
+    const now = Date.now();
+    lastGestureRef.current = { gesture: stableGesture, ts: now };
+    setParticleState("gesture");
+    sendToJarvis(command, "gesture", { fromGesture: true });
+  };
+
+  const handleLandmarks = landmarks => {
+    setParticleState(prev => (prev === "idle" ? "detected" : prev));
+  };
+
+  const handleHandPresenceChange = hasHand => {
+    if (!hasHand) {
+      setParticleState("idle");
+      if (handMissingTimeoutRef.current) clearTimeout(handMissingTimeoutRef.current);
+      handMissingTimeoutRef.current = setTimeout(() => {
+        setGestureAvailable(false);
+        setGestureToast("Gesture control unavailable (no hand detected)");
+      }, 2500);
+      return;
+    }
+
+    if (handMissingTimeoutRef.current) clearTimeout(handMissingTimeoutRef.current);
+    setGestureAvailable(true);
+    setGestureToast("");
+    if (!hasHand) {
+      setParticleState("idle");
+      return;
+    }
+    setParticleState(prev => (prev === "idle" ? "detected" : prev));
+  };
+
+  const handleGestureError = err => {
+    console.error("[Frontend] Gesture error:", err);
+    setGestureAvailable(false);
+    setGestureToast("Gesture control unavailable (camera access)");
+    setParticleState("error");
+  };
+
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col h-screen max-h-screen py-4">
+    <div className="w-full max-w-4xl mx-auto flex flex-col h-screen max-h-screen py-4 relative">
+      <ParticleCanvas state={particleState} />
+      <HandTracker
+        onGesture={handleGesture}
+        onLandmarks={handleLandmarks}
+        onHandPresenceChange={handleHandPresenceChange}
+        onError={handleGestureError}
+      />
+      {gestureToast && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-600/80 text-white text-xs px-3 py-2 rounded shadow-lg z-30">
+          {gestureToast}
+        </div>
+      )}
       {/* Futuristic Header */}
       <div className="mb-4 text-center shrink-0">
         <h1 className="text-4xl font-bold text-jarvis-cyan text-glow-cyan tracking-wider">
